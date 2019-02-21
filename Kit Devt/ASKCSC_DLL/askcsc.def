@@ -1,0 +1,275 @@
+
+; DLL export definition file
+
+LIBRARY											ASKCSC
+
+VERSION												4.08.09.21
+
+EXPORTS
+	CSC_Open								@1
+	CSC_Close								@2
+	CSC_VersionDLL							@3
+	CSC_ResetCSC							@4
+	CSC_VersionCSC							@5
+	CSC_CardConfig							@6
+	CSC_CardStartSearch						@7
+	CSC_CardStopSearch						@8
+	CSC_CardFound							@9
+	CSC_ISOCommand							@10
+	CSC_SendReceive							@11
+	CSC_AddCRC								@12
+	CSC_GetCommand							@13
+	CSC_CardEnd								@14
+	CSC_ResetSAM							@15
+	CSC_ISOCommandSAM						@16
+	CSC_SearchCSC							@17
+
+	CD97_AppendRecord						@18
+	CD97_ChangeKey							@19
+	CD97_ChangePIN							@20
+	CD97_Decrease							@21
+	CD97_Increase							@22
+	CD97_Invalidate							@23
+	CD97_Rehabilitate						@24
+	CD97_ReadRecord							@25
+	CD97_SelectFile							@26
+	CD97_StatusFile							@27
+	CD97_UpdateRecord						@28
+	CD97_WriteRecord						@29
+	CD97_VerifyPIN							@30
+	CD97_Purchase							@31
+	CD97_GetEPStatus						@32
+	CD97_ReloadEP							@33
+	CD97_OpenSession						@34
+	CD97_CloseSession						@35
+	CD97_CancelPurchase						@36
+
+	CSC_AntennaOFF							@37
+
+	GTML_AppendRecord						@38
+	GTML_ChangePIN							@39
+	GTML_Decrease							@40
+	GTML_Increase							@41
+	GTML_Invalidate							@42
+	GTML_Rehabilitate						@43
+	GTML_ReadRecord							@44
+	GTML_SelectFile							@45
+	GTML_UpdateRecord						@46
+	GTML_WriteRecord						@47
+	GTML_VerifyPIN							@48
+	GTML_OpenSession						@49
+	GTML_CloseSession						@50
+
+	CSC_SearchCard							@51
+	CSC_SelectSAM							@52
+	CSC_Switch_Led_Buz						@53
+
+	AppendRecord							@54	
+	ChangePIN								@55
+	Decrease								@56
+	Increase								@57
+	Invalidate								@58
+	Rehabilitate							@59
+	ReadRecord								@60
+	SelectFile								@61
+	StatusFile								@62
+	UpdateRecord							@63
+	WriteRecord								@64
+	VerifyPIN								@65
+	OpenSession								@66
+	OpenSessionExt							@67
+	CloseSession							@68
+	GetEPStatus_CD97						@69
+	ReloadEP_CD97							@70
+	Purchase_CD97							@71
+	CancelPurchase_CD97						@72
+	Lock_Unlock								@73
+	MultiDecrease							@74
+	MultiIncrease							@75
+	CTx_Active								@76
+	CTx_Read								@77
+	CTx_Update								@78
+	CTx_Release								@79
+	CheckCertificate						@80
+	GiveCertificate							@81
+
+	CSC_ChangeRS485Address					@82
+	CSC_ChangeDLLSpeed						@83
+	CSC_ChangeCSCSpeed						@84
+	CSC_SelectCID							@85
+	CSC_SelectDIV							@86
+	CSC_EHP_PARAMS							@87
+
+	MIFARE_LoadReaderKeyIndex				@88
+	MIFARE_ChangeKey						@89
+	MIFARE_Authenticate						@90
+	MIFARE_Halt								@91
+	MIFARE_ReadBlock						@92
+	MIFARE_ReadSector						@93
+	MIFARE_WriteBlock						@94
+	MIFARE_DecrementValue					@95
+	MIFARE_IncrementValue					@96
+	MIFARE_BackUpRestoreValue				@97
+	
+	CTx512B_List							@98
+	CTx512B_Select							@99
+	CTx512B_Read							@100
+	CTx512B_Update							@101
+	CTx512B_Halt							@102
+
+	CSC_ISOCommandContact					@103
+
+	PINStatus								@104
+
+	MIFARE_Select							@105
+
+	CSC_SearchCardExt						@106
+	CSC_SetTimings							@107
+	
+	CTx512x_List							@108
+	CTx512x_Select							@109
+	CTx512x_Read							@110
+	CTx512x_Update							@111
+	CTx512x_Halt							@112
+	CTx512x_Write							@113
+	CTx512x_Authenticate					@114
+	CTx512x_WriteKey						@115
+
+	CSC_WriteSAMNumber						@116
+	CSC_TransparentCommandConfig			@117
+	CSC_TransparentCommand					@118
+
+	CSC_DesactiveCRC						@119
+	CSC_GetUSBNumDevices					@120	
+	CSC_GetPCSCNumDevices					@121
+	CSC_GetPCSCDeviceName					@122
+	
+	CSC_DownloadStartCSC					@123
+	CSC_DownloadStopCSC						@124
+	
+	CSC_SendCOM								@125
+	PortNameIsPresent						@126
+	PortIsCDC								@127
+	RecoverCDCPort							@128
+
+	MIFARE_SAMNXP_Authenticate				@129
+	MIFARE_SAMNXP_ReAuthenticate			@130
+	MIFARE_SAMNXP_ReadBlock					@131
+	MIFARE_SAMNXP_WriteBlock				@132
+	MIFARE_SAMNXP_ChangeKey					@133
+	MIFARE_SAMNXP_Increment					@134
+	MIFARE_SAMNXP_Decrement					@135
+	MIFARE_SAMNXP_BackUpValue				@136
+	MIFARE_SAMNXP_KillAuthentication		@137
+		
+	CSC_EHP_PARAMS_EXT						@138
+	
+	MFP_SL3_Authentication					@139
+	MFP_SL3_ResetAuthentication				@140
+	MFP_SL3_ReadBlock						@141
+	MFP_SL3_WriteBlock						@142
+	MFP_SL3_ChangeKey						@143
+	MFP_SL3_VirtualCardSupport				@144
+	MFP_SL3_DeselectVirtualCard				@145
+	
+	SRX_Active								@146
+	SRX_ReadBlock							@147
+	SRX_WriteBlock							@148
+	SRX_Release								@149
+	SRX_Read								@150
+	SRX_Write								@151
+	
+	MIFARE_ReadMultipleBlock				@152
+	MIFARE_SimpleWriteBlock					@153
+	MIFARE_ReadSectorData					@154
+	MIFARE_WriteSectorData					@155
+	
+	DESFIRE_CreateApplication				@156
+	DESFIRE_DeleteApplication				@157
+	DESFIRE_SelectApplication				@158
+	DESFIRE_FormatPICC						@159
+	DESFIRE_GetApplicationIDs				@160
+	DESFIRE_GetVersion						@161
+	DESFIRE_GetFreeMem						@162
+	DESFIRE_Authenticate					@163
+	DESFIRE_CommitTransaction				@164
+	DESFIRE_AbortTransaction				@165
+	DESFIRE_ChangeKey						@166
+	DESFIRE_ChangeKeySetting				@167
+	DESFIRE_GetKeySetting					@168
+	DESFIRE_GetKeyVersion					@169
+	DESFIRE_ChangeFileSetting				@170
+	DESFIRE_ClearRecordFile					@171
+	DESFIRE_CreateBackUpDataFile			@172
+	DESFIRE_CreateCyclicRecordFile			@173
+	DESFIRE_CreateLinearRecordFile			@174
+	DESFIRE_CreateStandardDataFile			@175
+	DESFIRE_CreateValueFile					@176
+	DESFIRE_Credit							@177
+	DESFIRE_Debit							@178
+	DESFIRE_DeleteFile						@179
+	DESFIRE_GetFileID						@180
+	DESFIRE_GetFileSetting					@181
+	DESFIRE_GetValue						@182
+	DESFIRE_LimitedCredit					@183
+	DESFIRE_ReadData						@184
+	DESFIRE_WriteData						@185
+	DESFIRE_ReadRecord						@186
+	DESFIRE_WriteRecord						@187
+	DESFIRE_SamGetVersion					@188
+	DESFIRE_SamSelectApplication			@189
+	DESFIRE_SamLoadInitVector				@190
+	DESFIRE_SamGetKeyEntry					@191
+	DESFIRE_SamGetKucEntry					@192
+	DESFIRE_SamDisableCrypto				@193
+	
+	CSC_TransparentCommandConfigExt			@194
+	
+	CD97_AbortSecuredSession				@195
+	CD97_SelectISOApplication				@196
+	CD97_ChangeKeyExt						@197
+	CD97_ChangePINExt						@198
+	CD97_VerifyPINExt						@199
+	CD97_OpenSessionExt						@200
+	CD97_CloseSessionExt					@201
+	
+	GTML_AbortSecuredSession				@202
+	
+	ChangeKey								@203
+	AbortSecuredSession						@204
+	DecreaseLG								@205
+	IncreaseLG								@206
+	
+	CSC_WriteConfigEeprom					@207
+	CSC_ReadConfigEeprom					@208
+	CSC_ResetSAMExt							@209
+	CSC_ISOCommandExt						@210
+	CSC_ISOCommandSAMExt					@211
+	
+	MIFARE_Detect							@212
+	
+	CSC_SetSAMBaudratePPS					@213
+
+	EMVCo_UserInterface						@214
+	EMVCo_Contactless						@215
+	
+	CalypsoRev3_GetMode						@216
+	CalypsoRev3_SetMode						@217		
+	
+	MFUL_Identify							@218
+	MFUL_Read								@219
+	MFUL_Write								@220
+	MFULC_Authenticate						@221
+	MFULC_WriteKeyFromSAM					@222
+	
+	MFULEV1_PasswordAuthenticate			@223
+	MFULEV1_CreateDiversifiedPasswordandPACK @224
+	MFULEV1_ReadCounter						@225
+	MFULEV1_IncrementCounter				@226
+	MFULEV1_GetVersion						@227
+	MFULEV1_CheckTearingEvent				@228
+	
+	DESFIRE_PrepareAuthentication			@229
+	DESFIRE_AuthenticateEV1					@230
+	
+	wCSC_ReceiveCOM							@231

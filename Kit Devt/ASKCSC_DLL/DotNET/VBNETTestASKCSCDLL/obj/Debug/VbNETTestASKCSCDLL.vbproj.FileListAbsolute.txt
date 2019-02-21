@@ -1,0 +1,14 @@
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskREaderLib\bin\Debug\Askcsc.dll
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskREaderLib\bin\Debug\VbNETTestASKCSCDLL.exe.config
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskREaderLib\bin\Debug\VbNETTestASKCSCDLL.exe
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskREaderLib\bin\Debug\VbNETTestASKCSCDLL.pdb
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskREaderLib\bin\Debug\VbNETTestASKCSCDLL.xml
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\VBNETTestASKCSCDLL\obj\Debug\VbNETTestASKCSCDLL.vbprojAssemblyReference.cache
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\VBNETTestASKCSCDLL\obj\Debug\VbNETTestASKCSCDLL.Form1.resources
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\VBNETTestASKCSCDLL\obj\Debug\VbNETTestASKCSCDLL.Resources.resources
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\VBNETTestASKCSCDLL\obj\Debug\VbNETTestASKCSCDLL.vbproj.GenerateResource.cache
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\VBNETTestASKCSCDLL\obj\Debug\VbNETTestASKCSCDLL.vbproj.CoreCompileInputs.cache
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\VBNETTestASKCSCDLL\obj\Debug\VbNETTestASKCSCDLL.vbproj.CopyComplete
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\VBNETTestASKCSCDLL\obj\Debug\VbNETTestASKCSCDLL.exe
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\VBNETTestASKCSCDLL\obj\Debug\VbNETTestASKCSCDLL.xml
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\VBNETTestASKCSCDLL\obj\Debug\VbNETTestASKCSCDLL.pdb

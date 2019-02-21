@@ -1,0 +1,358 @@
+Monitor
+=======
+
+V2.35 2017/09/21
+================
+Enhancements:
+
+Fixes:
+	- Download panel: avoid "Loading fail" error on GEN5XX USB CDC, on Windows 10 and fast PC.
+
+	
+V2.34 2017/08/03
+================
+Enhancements:
+	- 64-bit version added.
+	
+
+V2.33 2017/06/12
+================
+Enhancements:
+		
+Fixes:
+	- Download panel: avoid "Loading fail" error on GEN5XX USB CDC, on Windows 10.
+	
+Known issue: 
+The restart of the CDC driver, on "Re-enum ports" button, works only on Windows 32-bit OS.
+
+
+V2.32 2017/04/24
+================
+Enhancements:
+	- ASKCSC.DLL V4.08.14.26 included.
+	- Support for RC66302 and RC66303 ("Send and Receive" & "RCXXX Configuration" panels)
+	- LPCD panel added.
+		
+Fixes:
+	
+Known issue: 
+The restart of the CDC driver, on "Re-enum ports" button, works only on Windows 32-bit OS.
+
+
+V2.31 2015/09/21
+================
+Enhancements:
+	- ASKCSC.DLL V4.08.13.25 included.
+	- New sequences files added (DESFire, Mifare UL EV1, Mifare ULC...).
+	- SAM ISO Command panel: add ISO mode on reset (only Innovatron HSP was supported)
+	- Commands Sequences panel: flag to disable green/red indicator on current sequence line ("DisableGreenRedIndicatorX=1")
+	- Commands Sequences panel: variables assignation and test ("VarXAssignY", "VarXTestY", "VarXEqualY", "VarXNotEqualY")
+Fixes:
+	- CSC Loader panel: grays "Load RF chip" button, during command line loading mode.
+	- EMVCo panel: remove last 3 bytes on command, launched by the "Loop-back with Optional Polling..." button.
+	- EMVCo panel: fix activation timeout issue on TA105.015 to support ASKCDC.DLL V4.8.12.24, with "NoRetryOnHostTimeout=1"
+	
+Known issue: 
+The restart of the CDC driver, on "Re-enum ports" button, works only on Windows 32-bit OS.
+
+
+V2.30 2014/02/19
+================
+- Protect UI during execution in progress (avoid application crashes)
+- Connection panel: button to restart CDC driver and re-enumerate ports.
+- Sequence panel:  add execution time of SendReceive.
+- EMVCo Tests panel:
+	- Maximul loop-back timeout set to 60 s.
+	- Default loop-back timeout set to 50 s.
+	- Add another EOT command: 0x72, to perform tPowerOff > 15 ms.
+	- WUPA-->RATS and WUPB-->ATTRIB sequences
+
+Known issue: 
+The restart of the CDC driver, on "Re-enum ports" button, works only on Windows 32-bit OS.
+
+	
+V2.29 2013/07/26
+================
+- EMVCo Tests panel:
+	- loop-back modified to support card without EMV loop-back.
+	- EOT command: 0x70 (INS) is the only byte checked.
+
+
+V2.28 2013/06/07
+================
+- EMVCo Tests panel enhanced.
+- Miscellaneous cosmetics changes.
+- PN512C2 support.
+
+
+V2.27 2013/05/23
+================
+- EMVCo Tests panel added.
+- Sequence panel:
+	- Ability to display decimal value in reverse byte ('DisplayReverseBytes=1' and '%llu' added in 'DisplayStrFormat')
+	- Ability to clear the log window ('ClearLog=1')
+
+
+V2.26 2013/03/18
+================
+- ASKCSC.DLL V4.08.11.23 included.
+- CSC Extented mode managment.
+
+
+V2.25 2012/09/17
+================
+- ASKCSC.DLL V4.08.10.22 included.
+- CSC Connection panel:
+	- Log of "Thru HCR" mode added. 
+	- Keep "Command" combo-box items during Monitor session.
+- Sequence panel:
+	- Get GEN5XX serial number.
+	- Miscellaneous cosmetics changes.
+	- Keep settings during Monitor session.
+- CSC Loader panel:
+	- Firmware loader is disabled on GEN5XX CCID, as it is not supported by the firmware loader.
+
+
+V2.24 2011/12/13
+================
+- Sequences panel: 
+	- Beep command added.
+
+- Configuration panel:
+	- Indexes 57 & 58 updated.
+
+- Communication port is displayed on application title. 
+
+
+V2.23 2011/01/26
+================
+- Sequences panel:
+	- Ability to increment or decrement variables ("VarXInc" and "VarXDec")
+
+
+V2.22 2010/12/17
+================
+- ASKCSC.DLL V4.08.09.16 included.
+- Miscellaneous cosmetics changes.
+- Sequences panel: 
+	- Correction: variable 1 and 2 are usable if variables 10-19 and 20 are used.
+	- Add Mifare Plus and buzzer sequence files.
+
+Known issue: 
+Application crashes, if command loop or sequences loop is not stopped before panel change or exit.
+
+
+V2.21 2010/11/08
+================
+- Miscellaneous cosmetics changes.
+- Sequences panel: 
+	- Up to 20 generic variables.
+- RCXXX congiguration pannel: 
+	- Write operation fixed.
+
+
+
+V2.20 2010/05/31
+================
+- Privilege elevation for Vista & Windows 7.
+- Sequence panel: "GotoOKx" fixed.
+- Configuration panel: label and signification updated to meet GEN5XX CSC 01.08 and above.
+- RCXXX congiguration pannel: updated for GEN5XX & I&Q channel.
+- Miscellaneous cosmetics changes.
+- Keep file dialog paths
+
+
+V2.19 2010/03/30
+================
+- Migration to VS2008.
+- New installer from VS2008.
+- ASKCSC.DLL V4.08.09.14 included (to support UCM108 based couplers, operating in USB CDC or USB CCID mode).
+- Connection panel: serial port enumeration for "Communication port" list.
+- Send and Receive panel: display single command execution duration.
+- Configuration panel: configuration items from 25 to 53 documented.
+- CSC loader panel: "Load RF chip" button added.
+
+
+V2.18 2009/06/26
+================
+- ASKCSC.dll V4.8.7.11 updated.
+- Timeout limit is 15 s for PC/SC connection.
+- Log capability (GenerateLogFile=1 in [Configuration] section of Monitor.ini)
+- Miscellaneous cosmetics changes:
+	- Send and receive panel: commands are no more duplicated in commands list.
+	- Configuration panel: reset button added, confirm clear configuration, AUX or AUX1/AUX2 pins comments.
+- Sequence panel:
+	- "StatusOrVal" and "StatusOrBadVal" tags added.	
+	- "GotoSequence" tag added.	
+	- if "Stop on com error" is ckecked, communication error stops the sequence.
+	- "DisplayStrFormat" tag: '%d' and '%u' can be combined with 'h', 'l' or 'L'.
+	- Sequences files updated.
+
+
+V2.17 2009/02/11 :
+==================
+- CSC_DownloadStart and CSC_DownloadStop moved to ASKCSC.DLL to handle GEN5XX USB CDC.
+
+- Send and Receive panel:
+	- Advanced mode: GEN5XX with PN512 chip recognized
+- Monitor.ini:
+	- Predefined commands added.
+
+
+V2.16 2008/09/17 :
+==================
+- Configuration panel: 
+	- Custom Frame Waiting Time (Value  * 10 ms, 00 or FF = no custom FWT) added.
+	- ISO14443-4 retries on PICC timeout (if value=1) added.
+
+- ASKCSC.dll V4.8.5.6 updated.
+
+V2.15 2008/07/24 :
+==================
+- Configuration panel: 
+	- Mifare selection before authentication added.
+ 	- MUX482 selection same as MUX382 added.
+
+
+V2.14 2007/12/14 :
+==================
+- Configuration panel: 
+	- ISO14443-3B & ISO14443-4B timeout strict check added.
+	- ISO14443-4 retries number and retries delay : 0 value is valid.
+	- ISO14443 delay after REQ/SELECT added.
+
+V2.13 2007/11/12 :
+==================
+- Sequences panel: 
+	- display elapsed time always, optional field off on error
+	- 16 sequence buttons
+	- keep data kept accross commands, 10 generic variables.
+- Configuration panel: 4th slot switch test added.
+- Thru HCR option is working on COM port number > 9.
+
+V2.12 2007/09/05 :
+==================
+- Command line options added.
+See "RD-AN-06097-13_ASK CSC downloading.pdf"
+
+V2.11 2007/08/06 :
+==================
+- Introducing command line to allow firmware downloading without user interaction.
+
+V2.10 2007/03/29 :
+==================
+- Configuration panel : configuration parameters added : AUX pin, high baud rate ISO14443A gain.
+- Sequences panel application note added in installation package.
+- RCXXX configuration panel added.
+- Drag and drop capability on filename entries.
+
+V2.09 2006/12/29 :
+==================
+- Configuration panel : load and save configuration files
+- Configuration panel : GEN4XX CSC 01.08 configuration parameters added.
+
+V2.08 2006/10/03 :
+==================
+- Sequences panel enhancement (visual signal, extented status test)
+- ASKCSC.dll V4.8.3.3 included.
+
+V2.07 2006/06/06 :
+==================
+- Sequences panel enhancement
+- Updated sequences files
+
+V2.06 2006/04/18 :
+==================
+- Add support for GEN4XX PCSC mode
+- Add sequences files
+- ISO command panel for all compliant cards
+- Calyspo serial number panel for all compliant cards
+- Miscellaneous user interface changes
+
+V2.05 2006/03/13 :
+==================
+- Miscellaneous user interface changes
+
+V2.04 2006/02/07 :
+==================
+- Miscellaneous user interface changes
+
+V2.03 2006/01/27 :
+==================
+- Correction on erasing flash function with ST9F150 based reader
+
+V2.02 2006/01/26 :
+==================
+- Migrating to Visual Studio .NET
+- Add clear configuration button in CSC configuration panel
+- Add Send sequences panel
+
+V2.01 2005/11/16 :
+==================
+- Add support for GEN4XX USB native mode
+
+V2.00 2005/11/15 : 
+==================
+- Add Send Loop function
+- Add CSC configuration
+- Add CSC Loader functionnality
+
+V1.13 2005/07/07 : 
+==================
+- Support 57600 kb/s
+- Allows up to 30 user commands
+
+V1.12 2005/06/13 :
+==================
+- Support of CSC CRC enable/disable
+
+V1.11 2005/04/04 : 
+==================
+- RCxxx utility enhancement : version and serial number, read & write eeprom config
+
+V1.10 2005/03/04 : 
+==================
+- RCxxx utility enhancement
+- Allows up to twenty user commands
+
+V1.09 2005/02/28 : 
+==================
+- RCxxx utility
+
+V1.08 2005/02/14 : 
+==================
+- Max baudrate = 691200 kb/s
+
+V1.07 2005/02/08 : 
+==================
+- Allow baud rate change (9600 to 460800 kb/s)
+
+V1.06 2005/01/07 : 
+==================
+- Reset and disconnect buttons are no longer active simultaneously
+- Miscellaneous user interface modifications
+
+V1.05 2004/12/30 : 
+==================
+- Dialog window : display real tx frame
+- Bug correction on getting CSC version (CString Buffer)
+		   
+V1.04 2004/12/27 : 
+==================
+- Thru HCR option added (commmunicate with CSC in HCR with Redboot tranparent mode)
+- Save communication port
+- Dialog window : copy enabled, automatic scrolling
+- Time out configuration : 3 to 180 seconds
+- Automatic CRC calulation before sending data
+- 270 bytes Send/Receive buffers (as askcsc.dll 4.05)
+- Ability to add and modify CSC user commands
+
+V1.03 2004/12/17 : 
+==================
+- select serial communication port from COM1 to COM128
+
+V1.02 2000/05/19 : 
+==================
+- initial version
+
+

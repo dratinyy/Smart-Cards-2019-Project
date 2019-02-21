@@ -1,0 +1,7 @@
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskReaderLib\bin\Debug\Askcsc.dll
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskReaderLib\bin\Debug\AskReaderLib.dll
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskReaderLib\bin\Debug\AskReaderLib.pdb
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskReaderLib\obj\Debug\AskReaderLib.csprojAssemblyReference.cache
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskReaderLib\obj\Debug\AskReaderLib.csproj.CoreCompileInputs.cache
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskReaderLib\obj\Debug\AskReaderLib.dll
+C:\Users\user\Documents\Cours\S9\9 - Smart Cards\Kit Devt\ASKCSC_DLL\DotNET\AskReaderLib\obj\Debug\AskReaderLib.pdb

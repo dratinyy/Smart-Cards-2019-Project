@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{9f8b4261-c129-4fc5-8806-b37806ad1459}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{bc0e3e01-b517-4297-bfef-5e69fb22bd0d}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{63366fef-3829-47f4-a179-e4cdb43607b6}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="askcsc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDCUtil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="csc_ord.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wincsc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="askcsc.def">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="askcsc.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="askcsc.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="askcsc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ASKPCSCEsc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDCUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="csc_def.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="csc_ord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FTD2XX.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wincsc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WinIo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ChangeHistory.txt" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,136 @@
+; FTDIBUS.INF
+; Copyright (c) 2000-2008 FTDI Ltd.
+;
+; USB serial converter driver installation for Windows 2000, XP, Server 2003, Vista, Server 2008 (x86 and x64).
+;
+
+[Version]
+Signature="$Windows NT$"
+DriverPackageType=PlugAndPlay
+DriverPackageDisplayName=%DESC%
+Class=%ClassName%
+ClassGUID={50DD5230-BA8A-11D1-BF5D-0000F805F530}
+
+Provider=%PROV%
+CatalogFile=ftdibus.cat
+DriverVer=03/13/2008,2.04.06
+
+[SourceDisksNames]
+1=%DriversDisk%,,,
+
+[SourceDisksFiles]
+ftdibus.sys = 1,i386
+ftbusui.dll = 1,i386
+ftd2xx.dll = 1,i386
+FTLang.Dll = 1,i386
+
+[SourceDisksFiles.amd64]
+ftdibus.sys = 1,amd64
+ftbusui.dll = 1,amd64
+ftd2xx64.dll = 1,amd64
+ftd2xx.dll = 1,i386
+FTLang.Dll = 1,amd64
+
+[DestinationDirs]
+FtdiBus.NT.Copy = 10,system32\drivers
+FtdiBus.NT.Copy2 = 10,system32
+FtdiBus.NTamd64.Copy = 10,system32\drivers
+FtdiBus.NTamd64.Copy2 = 10,system32
+FtdiBus.NTamd64.Copy3 = 10,syswow64
+
+
+[Manufacturer]
+%PROV%=FtdiHw,NTamd64
+
+[FtdiHw]
+%USB\VID_0403&PID_C990.DeviceDesc%=FtdiBus.NT,USB\VID_0403&PID_C990
+%USB\VID_0403&PID_C991.DeviceDesc%=FtdiBus.NT,USB\VID_0403&PID_C991
+%USB\VID_0403&PID_C992.DeviceDesc%=FtdiBus.NT,USB\VID_0403&PID_C992
+%USB\VID_0403&PID_C993.DeviceDesc%=FtdiBus.NT,USB\VID_0403&PID_C993
+%USB\VID_0403&PID_C994.DeviceDesc%=FtdiBus.NT,USB\VID_0403&PID_C994
+%USB\VID_0403&PID_C995.DeviceDesc%=FtdiBus.NT,USB\VID_0403&PID_C995
+%USB\VID_0403&PID_C996.DeviceDesc%=FtdiBus.NT,USB\VID_0403&PID_C996
+%USB\VID_0403&PID_C997.DeviceDesc%=FtdiBus.NT,USB\VID_0403&PID_C997
+%USB\VID_04D8&PID_FDF7.DeviceDesc%=FtdiBus.NT,USB\VID_04D8&PID_FDF7
+
+[FtdiHw.NTamd64]
+%USB\VID_0403&PID_C990.DeviceDesc%=FtdiBus.NTamd64,USB\VID_0403&PID_C990
+%USB\VID_0403&PID_C991.DeviceDesc%=FtdiBus.NTamd64,USB\VID_0403&PID_C991
+%USB\VID_0403&PID_C992.DeviceDesc%=FtdiBus.NTamd64,USB\VID_0403&PID_C992
+%USB\VID_0403&PID_C993.DeviceDesc%=FtdiBus.NTamd64,USB\VID_0403&PID_C993
+%USB\VID_0403&PID_C994.DeviceDesc%=FtdiBus.NTamd64,USB\VID_0403&PID_C994
+%USB\VID_0403&PID_C995.DeviceDesc%=FtdiBus.NTamd64,USB\VID_0403&PID_C995
+%USB\VID_0403&PID_C996.DeviceDesc%=FtdiBus.NTamd64,USB\VID_0403&PID_C996
+%USB\VID_0403&PID_C997.DeviceDesc%=FtdiBus.NTamd64,USB\VID_0403&PID_C997
+%USB\VID_04D8&PID_FDF7.DeviceDesc%=FtdiBus.NTamd64,USB\VID_04D8&PID_FDF7
+
+[ControlFlags]
+ExcludeFromSelect=*
+
+[FtdiBus.NT]
+CopyFiles=FtdiBus.NT.Copy,FtdiBus.NT.Copy2
+AddReg=FtdiBus.NT.AddReg
+
+[FtdiBus.NTamd64]
+CopyFiles=FtdiBus.NTamd64.Copy,FtdiBus.NTamd64.Copy2,FtdiBus.NTamd64.Copy3
+AddReg=FtdiBus.NT.AddReg
+
+[FtdiBus.NT.Services]
+AddService = FTDIBUS, 0x00000002, FtdiBus.NT.AddService
+
+[FtdiBus.NTamd64.Services]
+AddService = FTDIBUS, 0x00000002, FtdiBus.NT.AddService
+
+[FtdiBus.NT.AddService]
+DisplayName = %SvcDesc%
+ServiceType = 1 ; SERVICE_KERNEL_DRIVER
+StartType = 3 ; SERVICE_DEMAND_START
+ErrorControl = 1 ; SERVICE_ERROR_NORMAL
+ServiceBinary = %10%\system32\drivers\ftdibus.sys
+LoadOrderGroup = Base
+AddReg = FtdiBus.NT.AddService.AddReg
+
+[FtdiBus.NT.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,ftdibus.sys
+HKR,,EnumPropPages32,,"ftbusui.dll,FTBUSUIPropPageProvider"
+
+[FtdiBus.NT.AddService.AddReg]
+;HKR,Parameters,"LocIds",1,31,00,00,00,32,00,00,00,00
+;HKR,Parameters,"RetryResetCount",0x10001,50
+
+
+[FtdiBus.NT.Copy]
+ftdibus.sys
+
+[FtdiBus.NT.Copy2]
+ftbusui.dll
+ftd2xx.dll
+FTLang.dll
+
+[FtdiBus.NTamd64.Copy]
+ftdibus.sys
+
+[FtdiBus.NTamd64.Copy2]
+ftbusui.dll
+ftd2xx.dll,ftd2xx64.dll
+FTLang.dll
+
+[FtdiBus.NTamd64.Copy3]
+ftd2xx.dll
+
+[Strings]
+PROV="ASK"
+DESC="ASK Reader CDM Driver Package"
+ClassName="SmartCardReader"
+DriversDisk="ASK Reader Drivers Disk"
+USB\VID_0403&PID_C990.DeviceDesc="ASK RDR 407"
+USB\VID_0403&PID_C991.DeviceDesc="ASK RDR 417"
+USB\VID_0403&PID_C992.DeviceDesc="ASK CPL 407"
+USB\VID_0403&PID_C993.DeviceDesc="ASK LDB 215 + USB"
+USB\VID_0403&PID_C994.DeviceDesc="ASK RDR 437/447"
+USB\VID_0403&PID_C995.DeviceDesc="ASK Reader"
+USB\VID_0403&PID_C996.DeviceDesc="ASK Reader"
+USB\VID_0403&PID_C997.DeviceDesc="ASK Reader"
+USB\VID_04D8&PID_FDF7.DeviceDesc="ASK Reader"
+SvcDesc="ASK Reader Driver"
