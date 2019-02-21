@@ -157,111 +157,134 @@ namespace CSharpNETTestASKCSCDLL
 			return res;
 		}
 
-		private void Decode_smart_poster(byte[] sp)
+		private void Decode_Text(byte[] payload, int payload_len)
 		{
+			int offset = 0;
 
+			int status = payload[offset++];
+			int encoding = (status & 0b10000000) >> 7;
+			int iana_lang_code_len = status & 0b00111111;
+
+			if (encoding == 1) Console.WriteLine("utf-16"); else Console.WriteLine("utf-8");
+
+			byte[] iana_lang_code = new byte[iana_lang_code_len];
+			Array.Copy(payload, offset, iana_lang_code, 0, iana_lang_code_len);
+			Console.WriteLine("IANA Code: " + BitConverter.ToString(iana_lang_code));
+			Console.WriteLine("IANA Code: " + System.Text.Encoding.ASCII.GetString(iana_lang_code));
+			offset += iana_lang_code_len;
+
+			byte[] rest_of_payload = new byte[payload_len - iana_lang_code_len - 1];
+			Array.Copy(payload, offset, rest_of_payload, 0, payload_len - iana_lang_code_len - 1);
+
+			Console.WriteLine("PAYLOAD = " + BitConverter.ToString(rest_of_payload));
+			Console.WriteLine("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(rest_of_payload));
+		}
+
+		private void Decode_URI(byte[] payload, int payload_len)
+		{
+			Console.WriteLine("PAYLOAD = " + BitConverter.ToString(payload));
+			string uri_prefix = URI_identifier_code(payload[0]);
+			byte[] rest_of_payload = new byte[payload_len - 1];
+			Array.Copy(payload, 1, rest_of_payload, 0, payload_len - 1);
+			Console.WriteLine("PAYLOAD = " + uri_prefix + System.Text.Encoding.ASCII.GetString(payload));
 		}
 
 		private void Decode_NDEF(byte[] ndef)
 		{
+			Console.WriteLine("DECODING : " + BitConverter.ToString(ndef));
 			int offset = 0;
-			int nlen = (ndef[0] << 8) + ndef[1];
-			offset += 2;
-			Console.WriteLine("nlen = {0}", nlen);
+			int me;
 
-			// Parsing of the header (1st byte)
-			byte header = ndef[offset++];
-			int mb = (0b10000000 & header) >> 7;
-			int me = (0b01000000 & header) >> 6;
-			int cf = (0b00100000 & header) >> 5;
-			int sr = (0b00010000 & header) >> 4;
-			int il = (0b00001000 & header) >> 3;
-			int tnf = 0b00000111 & header;
-
-			Console.WriteLine("mb = " + mb);
-			Console.WriteLine("me = " + me);
-			Console.WriteLine("cf = " + cf);
-			Console.WriteLine("sr = " + sr);
-			Console.WriteLine("il = " + il);
-			Console.WriteLine("tnf = " + tnf);
-
-			byte type_len = ndef[offset++];
-			Console.WriteLine("type length = " + type_len);
-
-			// Parsing of the payload length, different according to sr
-			int payload_len;
-			if (sr == 1)
+			do
 			{
-				payload_len = ndef[offset++];
-			}
-			else
-			{
-				payload_len = (ndef[offset] << 3 * 8) + (ndef[offset + 1] << 2 * 8) + (ndef[offset + 2] << 8) + ndef[offset + 3];
-				offset += 4;
-			}
-			Console.WriteLine("Payload length = " + payload_len);
+				// Parsing of the header (1st byte)
+				byte header = ndef[offset++];
+				int mb = (0b10000000 & header) >> 7;
+				me = (0b01000000 & header) >> 6;
+				int cf = (0b00100000 & header) >> 5;
+				int sr = (0b00010000 & header) >> 4;
+				int il = (0b00001000 & header) >> 3;
+				int tnf = 0b00000111 & header;
 
-			// Parsing of the id length
-			int id_len = 0;
-			if (il == 1)
-			{
-				id_len = ndef[offset++];
-			} // else id_len = 0
-			Console.WriteLine("Id length = " + id_len);
+				Console.WriteLine("mb = " + mb);
+				Console.WriteLine("me = " + me);
+				Console.WriteLine("cf = " + cf);
+				Console.WriteLine("sr = " + sr);
+				Console.WriteLine("il = " + il);
+				Console.WriteLine("tnf = " + tnf);
 
-			// Parsing of the type, on type_len bytes
-			int type = 0;
-			for (int i = type_len - 1; i >= 0; i--)
-			{
-				Console.WriteLine(i + "eme partie de type : {0:X} ", ndef[offset]);
-				type += ndef[offset++] << (i * 8);
-			}
-			Console.WriteLine("Type = " + System.Text.Encoding.UTF8.GetString(BitConverter.GetBytes(type)));
-			switch (type)
-			{
-				case 0x54:
-					Console.WriteLine("Type is text"); break;
-				case 0x55:
-					Console.WriteLine("Type is URI"); break;
-				case 0x5370:
-					Console.WriteLine("Type is smart poster"); break;
-				default: break;
-			}
+				byte type_len = ndef[offset++];
+				Console.WriteLine("type length = " + type_len);
 
-			// Parsing of the id, on id_len bytes
-			int id = 0;
-			for (int i = 0; i < id_len; i++)
-			{
-				id += ndef[offset++] << (id_len - i - 1);
-			}
-			Console.WriteLine("Id = " + id);
+				// Parsing of the payload length, different according to sr
+				int payload_len;
+				if (sr == 1)
+				{
+					payload_len = ndef[offset++];
+				}
+				else
+				{
+					payload_len = (ndef[offset] << 3 * 8) + (ndef[offset + 1] << 2 * 8) + (ndef[offset + 2] << 8) + ndef[offset + 3];
+					offset += 4;
+				}
+				Console.WriteLine("Payload length = " + payload_len);
 
-			byte[] payload = new byte[payload_len];
-			Array.Copy(ndef, offset, payload, 0, payload_len);
-			Console.WriteLine("PAYLOAD = " + BitConverter.ToString(payload));
-			Console.WriteLine("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload));
+				// Parsing of the id length
+				int id_len = 0;
+				if (il == 1)
+				{
+					id_len = ndef[offset++];
+				} // else id_len = 0
+				Console.WriteLine("Id length = " + id_len);
 
-			// Decoding NDEF
-			/*
-			while (offset < file_size)
-			{
-				int message_size = (ndef[offset] << 8) + ndef[offset + 1];
-				byte type_length = ndef[offset + 3];
-				byte payload_length = ndef[offset + 4];
-				Console.WriteLine("Type length is " + type_length + ", Payload length is " + payload_length);
-				byte[] type = new byte[type_length];
-				Array.Copy(ndef, 5, type, 0, type_length);
-				byte[] payload = new byte[payload_length];
-				Array.Copy(ndef, 5 + type_length, payload, 0, payload_length);
-				resp = BitConverter.ToString(type);
-				Console.WriteLine("TYPE IS: " + resp);
-				resp = BitConverter.ToString(payload);
-				Console.WriteLine("PAYLOAD IS: " + resp);
-				Console.WriteLine("PAYLOAD IS: " + System.Text.Encoding.ASCII.GetString(payload));
-				//offset += message_size;
-				offset += file_size;
-			}
-			*/
+				// Parsing of the type, on type_len bytes
+				int type = 0;
+				for (int i = type_len - 1; i >= 0; i--)
+				{
+					Console.WriteLine(i + "eme partie de type : {0:X} ", ndef[offset]);
+					type += ndef[offset++] << (i * 8);
+				}
+
+				switch (type)
+				{
+					case 0x54:
+						Console.WriteLine("Type is text"); break;
+					case 0x55:
+						Console.WriteLine("Type is URI"); break;
+					case 0x5370:
+						Console.WriteLine("Type is smart poster"); break;
+					default:
+						Console.WriteLine("Type = " + System.Text.Encoding.UTF8.GetString(BitConverter.GetBytes(type))); break;
+				}
+
+				// Parsing of the id, on id_len bytes
+				int id = 0;
+				for (int i = 0; i < id_len; i++)
+				{
+					id += ndef[offset++] << (id_len - i - 1);
+				}
+				Console.WriteLine("Id = " + id);
+
+				// We store the payload
+				byte[] payload = new byte[payload_len];
+				Array.Copy(ndef, offset, payload, 0, payload_len);
+				offset += payload_len;
+
+				// Different processing of the payload depending on the type
+				switch (type)
+				{
+					case 0x54:
+						Decode_Text(payload, payload_len); break;
+					case 0x55:
+						Decode_URI(payload, payload_len); break;
+					case 0x5370:
+						Decode_NDEF(payload); break;
+					default:
+						Console.WriteLine("Type = " + System.Text.Encoding.UTF8.GetString(BitConverter.GetBytes(type))); break;
+				}
+			} while (me != 1);
+
+			
 		}
 
 		private void Button1_Click(object sender, EventArgs e)
@@ -392,7 +415,12 @@ namespace CSharpNETTestASKCSCDLL
 					//resp = BitConverter.ToString(file_content);
 					Console.WriteLine("[READ BINARY] Full file content: " + BitConverter.ToString(file_content));
 
-					Decode_NDEF(file_content);
+					int nlen = (file_content[0] << 8) + file_content[1];
+					Console.WriteLine("nlen = {0}", nlen);
+					byte[] actual_file_content = new byte[nlen];
+					Array.Copy(file_content, 2, actual_file_content, 0, nlen);
+
+					Decode_NDEF(actual_file_content);
 
 				}
 			}
