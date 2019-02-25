@@ -3,8 +3,6 @@ package smartcards.nice.polytech.projetsmartcards;
 import android.content.Context;
 import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
-import android.util.Log;
-import android.util.Size;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -85,9 +83,9 @@ public class cCardService extends HostApduService {
             return CLA_INCONNUE;
         }
 
-        /*
-         * ICI C SELECT
-         */
+        // **********************
+        // Process SELECT Command
+        // **********************
         if (INS == (byte) 0xA4) {
 
             byte P1 = byAPDU[2], P2 = byAPDU[3], Lc = byAPDU[4], Le;
@@ -121,11 +119,12 @@ public class cCardService extends HostApduService {
             } else
 
                 return P1_P2_INCORRECT_SELECT;
+        }
 
-            /*
-             * ICI C READ
-             */
-        } else if (INS == (byte) 0xB0) {
+        // ********************
+        // Process READ Command
+        // ********************
+        else if (INS == (byte) 0xB0) {
 
             byte P1 = byAPDU[2], P2 = byAPDU[3], Le = byAPDU[4];
 
@@ -141,11 +140,12 @@ public class cCardService extends HostApduService {
             // TODO: Read file.
 
             return RETOUR_OK;
+        }
 
-            /*
-             * ICI C UPDATE
-             */
-        } else if (INS == (byte) 0xD6) {
+        // **********************
+        // Process UPDATE Command
+        // **********************
+        else if (INS == (byte) 0xD6) {
 
             byte P1 = byAPDU[2], P2 = byAPDU[3], Lc = byAPDU[4];
             byte[] Data = Arrays.copyOfRange(byAPDU, 5, 5 + Lc);

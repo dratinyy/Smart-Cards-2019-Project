@@ -1,0 +1,4 @@
+*.iml
+.gradle
+ProjetSmartCards/local.properties
+ProjetSmartCards/.idea/*
