@@ -3,9 +3,11 @@ package smartcards.nice.polytech.projetsmartcards;
 import android.content.Context;
 import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -23,6 +25,7 @@ public class cCardService extends HostApduService {
     byte[] P1_P2_INCORRECT_READ_UPDATE = new byte[]{(byte) 0x6B, (byte) 0x00};
     byte[] OFFSET_LC_INCORRECT = new byte[]{(byte) 0x6A, (byte) 0x87};
     byte[] OFFSET_LE_INCORRECT = new byte[]{(byte) 0x6C, (byte) 0x00};
+    byte[] UPDATE_CCFILE_INTERDIT = new byte[]{(byte) 0x69, (byte) 0x85};
     byte[] RETOUR_OK = new byte[]{(byte) 0x90, (byte) 0x00};
 
     byte[] SELECT_APPLICATION_AID = new byte[]{(byte) 0xD2,
@@ -37,31 +40,56 @@ public class cCardService extends HostApduService {
     File ccFile;
     File NDEFFile;
     int NDEFFileSize = -1;
+    int NDEFFileMaxSize = 4096;
     int selectedFile = 0;
+
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
 
     public cCardService() {
         super();
+    }
+
+    public void onCreate() {
+        File directory = this.getDir("SCProjectDir", Context.MODE_PRIVATE);
+
         String filename = "MyCCFile";
-        ccFile = new File(filename);
-        if (!ccFile.exists()) {
-            try {
-                FileOutputStream outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-                outputStream.write(new byte[]{(byte) 0x00, (byte) 0x0F}); // Size
-                outputStream.write(new byte[]{(byte) 0x20}); // Map
-                outputStream.write(new byte[]{(byte) 0x00, (byte) 0xF0}); // MLe
-                outputStream.write(new byte[]{(byte) 0x00, (byte) 0xF0}); // MLc
-                outputStream.write(new byte[]{(byte) 0x04, (byte) 0x06,
-                        (byte) 0x81, (byte) 0x01,
-                        (byte) 0x80, (byte) 0x00,
-                        (byte) 0x00, (byte) 0x00}); // TLV
-                outputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        ccFile = new File(directory, filename);
+        try {
+            ccFile.createNewFile();
+            FileOutputStream outputStream = openFileOutput(ccFile.getName(), Context.MODE_PRIVATE);
+            outputStream.write(new byte[]{(byte) 0x00, (byte) 0x0F}); // Size
+            outputStream.write(new byte[]{(byte) 0x20}); // Map
+            outputStream.write(new byte[]{(byte) 0x00, (byte) 0xF0}); // MLe
+            outputStream.write(new byte[]{(byte) 0x00, (byte) 0xF0}); // MLc
+            outputStream.write(new byte[]{(byte) 0x04, (byte) 0x06,
+                    (byte) 0x81, (byte) 0x01,
+                    (byte) 0x80, (byte) 0x00,
+                    (byte) 0x00, (byte) 0x00}); // TLV
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         filename = "MyNDEFFile";
-        NDEFFile = new File(filename);
+        NDEFFile = new File(directory, filename);
+        if (!NDEFFile.exists())
+            try {
+                NDEFFile.createNewFile();
+                FileOutputStream outputStream = openFileOutput(NDEFFile.getName(), Context.MODE_PRIVATE);
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         try {
             BufferedReader br = new BufferedReader(new FileReader(NDEFFile));
             String line;
@@ -89,7 +117,7 @@ public class cCardService extends HostApduService {
         if (INS == (byte) 0xA4) {
 
             byte P1 = byAPDU[2], P2 = byAPDU[3], Lc = byAPDU[4], Le;
-            byte[] Data = Arrays.copyOfRange(byAPDU, 5, Lc);
+            byte[] Data = Arrays.copyOfRange(byAPDU, 5, 5 + Lc);
             if (byAPDU.length > Lc)
                 Le = byAPDU[1 + Lc];
 
@@ -128,18 +156,50 @@ public class cCardService extends HostApduService {
 
             byte P1 = byAPDU[2], P2 = byAPDU[3], Le = byAPDU[4];
 
-            if (currentState != ETAT_SELECT_FILE)
+            if (currentState != ETAT_SELECT_FILE || (selectedFile != 1 && selectedFile != 2))
                 return ETAT_NON_CONFORME;
-            if (P1 > (byte) 0x7F)
-                return P1_P2_INCORRECT_READ_UPDATE;
-            if (Le > (byte) 0xF0)
-                return LE_INCORRECT;
-            if (P1 * 16 + P2 + Le > NDEFFileSize) // TODO: byte / int comparison ?
-                return OFFSET_LE_INCORRECT;
 
-            // TODO: Read file.
+            // Reading CC File
+            if (selectedFile == 1) {
+                if (P1 > (byte) 0x7F)
+                    return P1_P2_INCORRECT_READ_UPDATE;
+                if (Le > (byte) 0x0F)
+                    return LE_INCORRECT;
+                if (P1 * 16 + P2 + Le > 0x0F) // TODO: byte / int comparison ?
+                    return OFFSET_LE_INCORRECT;
 
-            return RETOUR_OK;
+                byte[] result = new byte[Le + 2];
+                try {
+                    FileInputStream ccFileReader = new FileInputStream(ccFile.getAbsolutePath());
+                    ccFileReader.read(result);
+                    Log.d("SLT", bytesToHex(result));
+                } catch (IOException e) {
+                    // TODO: can this ever happen ?
+                    Log.e("ERR", e.getMessage());
+                }
+                System.arraycopy(RETOUR_OK, 0, result, Le, 2);
+                return result;
+            }
+
+            // Reading NDEF File
+            else {
+                if (P1 > (byte) 0x7F)
+                    return P1_P2_INCORRECT_READ_UPDATE;
+                if (Le > (byte) 0x0F)
+                    return LE_INCORRECT;
+                if (P1 * 16 + P2 + Le > NDEFFileSize) // TODO: byte / int comparison ?
+                    return OFFSET_LE_INCORRECT;
+
+                byte[] result = new byte[Le + 2];
+                try {
+                    FileInputStream NDEFFileReader = new FileInputStream(NDEFFile);
+                    NDEFFileReader.read(result, P1 * 16 + P2, Le);
+                } catch (IOException e) {
+                    // TODO: can this ever happen ?
+                }
+                System.arraycopy(RETOUR_OK, 0, result, Le, 2);
+                return result;
+            }
         }
 
         // **********************
@@ -150,14 +210,24 @@ public class cCardService extends HostApduService {
             byte P1 = byAPDU[2], P2 = byAPDU[3], Lc = byAPDU[4];
             byte[] Data = Arrays.copyOfRange(byAPDU, 5, 5 + Lc);
 
-            if (currentState != ETAT_SELECT_FILE)
+            if (currentState != ETAT_SELECT_FILE || (selectedFile != 1 && selectedFile != 2))
                 return ETAT_NON_CONFORME;
+            if (selectedFile != 2)
+                return UPDATE_CCFILE_INTERDIT;
+
             if (Lc > (byte) 0xF0 || Lc != (byte) Data.length)
                 return LC_INCORRECT;
-            if (P1 * 16 + P2 + Lc > NDEFFileSize) // TODO: byte / int comparison ?
+            if (P1 * 16 + P2 + Lc > NDEFFileMaxSize) // TODO: byte / int comparison ?
                 return OFFSET_LC_INCORRECT;
 
-            // TODO: Update file.
+            // Updating NDEF File
+            try {
+                FileOutputStream outputStream = openFileOutput(NDEFFile.getName(), Context.MODE_PRIVATE);
+                outputStream.write(Data, P1 * 16 + P2, Lc); // TLV
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             return RETOUR_OK;
         } else {
