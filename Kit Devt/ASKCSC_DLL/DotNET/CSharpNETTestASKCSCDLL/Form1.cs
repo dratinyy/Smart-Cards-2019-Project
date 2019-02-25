@@ -189,7 +189,7 @@ namespace CSharpNETTestASKCSCDLL
 			Console.WriteLine("PAYLOAD = " + uri_prefix + System.Text.Encoding.ASCII.GetString(payload));
 		}
 
-		private void Decode_NDEF(byte[] ndef)
+		private int Decode_NDEF(byte[] ndef)
 		{
 			Console.WriteLine("DECODING : " + BitConverter.ToString(ndef));
 			int offset = 0;
@@ -238,23 +238,27 @@ namespace CSharpNETTestASKCSCDLL
 				Console.WriteLine("Id length = " + id_len);
 
 				// Parsing of the type, on type_len bytes
-				int type = 0;
-				for (int i = type_len - 1; i >= 0; i--)
+				byte[] type = new byte[type_len];
+				for (int i = 0; i < type_len; i++)
 				{
-					Console.WriteLine(i + "eme partie de type : {0:X} ", ndef[offset]);
-					type += ndef[offset++] << (i * 8);
+					type[i] = ndef[offset++];
 				}
 
-				switch (type)
+				if(type[0] == 0x54)
 				{
-					case 0x54:
-						Console.WriteLine("Type is text"); break;
-					case 0x55:
-						Console.WriteLine("Type is URI"); break;
-					case 0x5370:
-						Console.WriteLine("Type is smart poster"); break;
-					default:
-						Console.WriteLine("Type = " + System.Text.Encoding.UTF8.GetString(BitConverter.GetBytes(type))); break;
+					Console.WriteLine("Type is text");
+				}
+				else if(type[0] == 0x55)
+				{
+					Console.WriteLine("Type is URI");
+				}
+				else if(type[0] == 0x53 && type[1] == 0x70)
+				{
+					Console.WriteLine("Type is smart poster");
+				}
+				else
+				{
+					Console.WriteLine("Type is: " + System.Text.Encoding.ASCII.GetString(type) + " (not supported)");
 				}
 
 				// Parsing of the id, on id_len bytes
@@ -271,20 +275,26 @@ namespace CSharpNETTestASKCSCDLL
 				offset += payload_len;
 
 				// Different processing of the payload depending on the type
-				switch (type)
+				if (type[0] == 0x54)
 				{
-					case 0x54:
-						Decode_Text(payload, payload_len); break;
-					case 0x55:
-						Decode_URI(payload, payload_len); break;
-					case 0x5370:
-						Decode_NDEF(payload); break;
-					default:
-						Console.WriteLine("Type = " + System.Text.Encoding.UTF8.GetString(BitConverter.GetBytes(type))); break;
+					Decode_Text(payload, payload_len);
+				}
+				else if (type[0] == 0x55)
+				{
+					Decode_URI(payload, payload_len);
+				}
+				else if (type[0] == 0x53 && type[1] == 0x70)
+				{
+					Decode_NDEF(payload);
+				}
+				else //Unsupported type, we print it as ASCII
+				{
+					Console.WriteLine("PAYLOAD = " + BitConverter.ToString(payload));
+					Console.WriteLine("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload));
 				}
 			} while (me != 1);
 
-			
+			return offset;
 		}
 
 		private void Button1_Click(object sender, EventArgs e)
@@ -420,7 +430,12 @@ namespace CSharpNETTestASKCSCDLL
 					byte[] actual_file_content = new byte[nlen];
 					Array.Copy(file_content, 2, actual_file_content, 0, nlen);
 
-					Decode_NDEF(actual_file_content);
+					int offset = Decode_NDEF(actual_file_content);
+					Console.WriteLine("offset = {0}, nlen = {1}", offset, nlen);
+					if(offset != nlen)
+					{
+						Console.WriteLine("We didn't read everything, check if there's an early me set at 1");
+					}
 
 				}
 			}
