@@ -37,22 +37,22 @@ public class cCardService extends HostApduService {
     int ETAT_SELECT_FILE = 1;
     int currentState = ETAT_SELECT_APP;
 
-    File ccFile;
     File NDEFFile;
     int NDEFFileSize = -1;
     int NDEFFileMaxSize = 4096;
     int selectedFile = 0;
 
-    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
-    public static String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for ( int j = 0; j < bytes.length; j++ ) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
+//    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+//
+//    public static String bytesToHex(byte[] bytes) {
+//        char[] hexChars = new char[bytes.length * 2];
+//        for (int j = 0; j < bytes.length; j++) {
+//            int v = bytes[j] & 0xFF;
+//            hexChars[j * 2] = hexArray[v >>> 4];
+//            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+//        }
+//        return new String(hexChars);
+//    }
 
     public cCardService() {
         super();
@@ -61,25 +61,7 @@ public class cCardService extends HostApduService {
     public void onCreate() {
         File directory = this.getDir("SCProjectDir", Context.MODE_PRIVATE);
 
-        String filename = "MyCCFile";
-        ccFile = new File(directory, filename);
-        try {
-            ccFile.createNewFile();
-            FileOutputStream outputStream = openFileOutput(ccFile.getName(), Context.MODE_PRIVATE);
-            outputStream.write(new byte[]{(byte) 0x00, (byte) 0x0F}); // Size
-            outputStream.write(new byte[]{(byte) 0x20}); // Map
-            outputStream.write(new byte[]{(byte) 0x00, (byte) 0xF0}); // MLe
-            outputStream.write(new byte[]{(byte) 0x00, (byte) 0xF0}); // MLc
-            outputStream.write(new byte[]{(byte) 0x04, (byte) 0x06,
-                    (byte) 0x81, (byte) 0x01,
-                    (byte) 0x80, (byte) 0x00,
-                    (byte) 0x00, (byte) 0x00}); // TLV
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        filename = "MyNDEFFile";
+        String filename = "MyNDEFFile";
         NDEFFile = new File(directory, filename);
         if (!NDEFFile.exists())
             try {
@@ -105,7 +87,7 @@ public class cCardService extends HostApduService {
     @Override
     public byte[] processCommandApdu(final byte[] byAPDU, Bundle extras) {
 
-        byte CLA = byAPDU[0], INS = byAPDU[1];
+        int CLA = byAPDU[0] & 0xFF, INS = byAPDU[1] & 0xFF;
 
         if (CLA != 0x00) {
             return CLA_INCONNUE;
@@ -114,14 +96,14 @@ public class cCardService extends HostApduService {
         // **********************
         // Process SELECT Command
         // **********************
-        if (INS == (byte) 0xA4) {
+        if (INS == 0xA4) {
 
-            byte P1 = byAPDU[2], P2 = byAPDU[3], Lc = byAPDU[4], Le;
+            int P1 = byAPDU[2] & 0xFF, P2 = byAPDU[3] & 0xFF, Lc = byAPDU[4] & 0xFF, Le;
             byte[] Data = Arrays.copyOfRange(byAPDU, 5, 5 + Lc);
             if (byAPDU.length > Lc)
-                Le = byAPDU[1 + Lc];
+                Le = byAPDU[1 + Lc] & 0xFF;
 
-            if (P1 == (byte) 0x04 && P2 == (byte) 0x00) {
+            if (P1 == 0x04 && P2 == 0x00) {
 
                 if (5 > Lc || Lc > 16)
                     return LC_INCORRECT;
@@ -130,7 +112,7 @@ public class cCardService extends HostApduService {
                 currentState = ETAT_SELECT_APP;
                 return RETOUR_OK;
 
-            } else if (P1 == (byte) 0x00 && P2 == (byte) 0x0C) {
+            } else if (P1 == 0x00 && P2 == 0x0C) {
 
                 if (Lc != 2)
                     return LC_INCORRECT;
@@ -152,12 +134,13 @@ public class cCardService extends HostApduService {
         // ********************
         // Process READ Command
         // ********************
-        else if (INS == (byte) 0xB0) {
+        else if (INS == 0xB0) {
 
-            byte P1 = byAPDU[2], P2 = byAPDU[3], Le = byAPDU[4];
+            int P1 = byAPDU[2] & 0xFF, P2 = byAPDU[3] & 0xFF, Le = byAPDU[4] & 0xFF;
 
             if (currentState != ETAT_SELECT_FILE || (selectedFile != 1 && selectedFile != 2))
                 return ETAT_NON_CONFORME;
+            Log.e("Le SIZE", String.valueOf(Le));
 
             // Reading CC File
             if (selectedFile == 1) {
@@ -168,15 +151,11 @@ public class cCardService extends HostApduService {
                 if (P1 * 16 + P2 + Le > 0x0F) // TODO: byte / int comparison ?
                     return OFFSET_LE_INCORRECT;
 
+                byte[] CCFileContent = new byte[]{(byte) 0x00, (byte) 0x0F, (byte) 0x20, (byte) 0x00,
+                        (byte) 0xF0, (byte) 0x00, (byte) 0xF0, (byte) 0x04, (byte) 0x06, (byte) 0x81,
+                        (byte) 0x01, (byte) 0x80, (byte) 0x00, (byte) 0x00, (byte) 0x00};
                 byte[] result = new byte[Le + 2];
-                try {
-                    FileInputStream ccFileReader = new FileInputStream(ccFile.getAbsolutePath());
-                    ccFileReader.read(result);
-                    Log.d("SLT", bytesToHex(result));
-                } catch (IOException e) {
-                    // TODO: can this ever happen ?
-                    Log.e("ERR", e.getMessage());
-                }
+                System.arraycopy(CCFileContent, P2, result, 0, Le);
                 System.arraycopy(RETOUR_OK, 0, result, Le, 2);
                 return result;
             }
@@ -185,9 +164,10 @@ public class cCardService extends HostApduService {
             else {
                 if (P1 > (byte) 0x7F)
                     return P1_P2_INCORRECT_READ_UPDATE;
-                if (Le > (byte) 0x0F)
+                if (Le > 0xF0) {
                     return LE_INCORRECT;
-                if (P1 * 16 + P2 + Le > NDEFFileSize) // TODO: byte / int comparison ?
+                }
+                if (P1 * 16 + P2 + Le > NDEFFileSize || P1 * 16 + P2 + Le > 0x7FFF) // TODO: byte / int comparison ?
                     return OFFSET_LE_INCORRECT;
 
                 byte[] result = new byte[Le + 2];
@@ -205,9 +185,9 @@ public class cCardService extends HostApduService {
         // **********************
         // Process UPDATE Command
         // **********************
-        else if (INS == (byte) 0xD6) {
+        else if (INS == 0xD6) {
 
-            byte P1 = byAPDU[2], P2 = byAPDU[3], Lc = byAPDU[4];
+            int P1 = byAPDU[2] & 0xFF, P2 = byAPDU[3] & 0xFF, Lc = byAPDU[4] & 0xFF;
             byte[] Data = Arrays.copyOfRange(byAPDU, 5, 5 + Lc);
 
             if (currentState != ETAT_SELECT_FILE || (selectedFile != 1 && selectedFile != 2))
@@ -215,7 +195,7 @@ public class cCardService extends HostApduService {
             if (selectedFile != 2)
                 return UPDATE_CCFILE_INTERDIT;
 
-            if (Lc > (byte) 0xF0 || Lc != (byte) Data.length)
+            if (Lc > 0xF0 || Lc != Data.length)
                 return LC_INCORRECT;
             if (P1 * 16 + P2 + Lc > NDEFFileMaxSize) // TODO: byte / int comparison ?
                 return OFFSET_LC_INCORRECT;
