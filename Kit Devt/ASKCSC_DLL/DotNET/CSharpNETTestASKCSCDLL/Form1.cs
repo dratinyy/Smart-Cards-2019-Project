@@ -261,31 +261,40 @@ namespace CSharpNETTestASKCSCDLL
 					type[i] = ndef[offset++];
 				}
 
-				if(type[0] == 0x54)
+				if(type_len == 0)
 				{
-					Console.WriteLine("Type is text");
+					Console.WriteLine("Type is <empty>");
 					for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
-					textBox1.AppendText("Type is text" + System.Environment.NewLine);
-				}
-				else if(type[0] == 0x55)
-				{
-					Console.WriteLine("Type is URI");
-					for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
-					textBox1.AppendText("Type is URI" + System.Environment.NewLine);
-				}
-				else if(type[0] == 0x53 && type[1] == 0x70)
-				{
-					Console.WriteLine("Type is smart poster");
-					for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
-					textBox1.AppendText("Type is smart poster" + System.Environment.NewLine);
+					textBox1.AppendText("Type is <empty>" + System.Environment.NewLine);
 				}
 				else
 				{
-					Console.WriteLine("Type is: " + System.Text.Encoding.ASCII.GetString(type) + " (not supported)");
-					for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
-					textBox1.AppendText("Type is: " + System.Text.Encoding.ASCII.GetString(type) + " (not supported)" + System.Environment.NewLine);
+					if (type[0] == 0x54)
+					{
+						Console.WriteLine("Type is text");
+						for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
+						textBox1.AppendText("Type is text" + System.Environment.NewLine);
+					}
+					else if (type[0] == 0x55)
+					{
+						Console.WriteLine("Type is URI");
+						for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
+						textBox1.AppendText("Type is URI" + System.Environment.NewLine);
+					}
+					else if (type[0] == 0x53 && type[1] == 0x70)
+					{
+						Console.WriteLine("Type is smart poster");
+						for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
+						textBox1.AppendText("Type is smart poster" + System.Environment.NewLine);
+					}
+					else
+					{
+						Console.WriteLine("Type is: " + System.Text.Encoding.ASCII.GetString(type) + " (not supported)");
+						for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
+						textBox1.AppendText("Type is: " + System.Text.Encoding.ASCII.GetString(type) + " (not supported)" + System.Environment.NewLine);
+					}
 				}
-
+				
 				// Parsing of the id, on id_len bytes
 				int id = 0;
 				for (int i = 0; i < id_len; i++)
@@ -300,29 +309,40 @@ namespace CSharpNETTestASKCSCDLL
 				offset += payload_len;
 
 				// Different processing of the payload depending on the type
-				if (type[0] == 0x54) // 'T' => Text
+				if(type_len == 0)
 				{
-					Decode_Text(payload, payload_len);
-				}
-				else if (type[0] == 0x55) // 'U' => URI
-				{
-					Decode_URI(payload, payload_len);
-				}
-				else if (type[0] == 0x53 && type[1] == 0x70) // 'sp' => smart poster
-				{
-					indentention++;
-					Decode_NDEF(payload);
-					indentention--;
-				}
-				else //Unsupported type, we print it as ASCII
-				{
-					Console.WriteLine("PAYLOAD = " + BitConverter.ToString(payload));
-					Console.WriteLine("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload));
 					for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
 					textBox1.AppendText("PAYLOAD = " + BitConverter.ToString(payload) + System.Environment.NewLine);
 					for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
 					textBox1.AppendText("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload) + System.Environment.NewLine);
 				}
+				else
+				{
+					if (type[0] == 0x54) // 'T' => Text
+					{
+						Decode_Text(payload, payload_len);
+					}
+					else if (type[0] == 0x55) // 'U' => URI
+					{
+						Decode_URI(payload, payload_len);
+					}
+					else if (type[0] == 0x53 && type[1] == 0x70) // 'sp' => smart poster
+					{
+						indentention++;
+						Decode_NDEF(payload);
+						indentention--;
+					}
+					else //Unsupported type, we print it as ASCII
+					{
+						Console.WriteLine("PAYLOAD = " + BitConverter.ToString(payload));
+						Console.WriteLine("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload));
+						for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
+						textBox1.AppendText("PAYLOAD = " + BitConverter.ToString(payload) + System.Environment.NewLine);
+						for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
+						textBox1.AppendText("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload) + System.Environment.NewLine);
+					}
+				}
+				
 				textBox1.AppendText(System.Environment.NewLine);
 			} while (me != 1);
 
