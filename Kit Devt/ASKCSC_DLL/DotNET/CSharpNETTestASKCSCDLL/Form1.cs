@@ -157,6 +157,9 @@ namespace CSharpNETTestASKCSCDLL
 			return res;
 		}
 
+		/**
+		 * This method decode a payload of nfc known type text 
+		 */
 		private void Decode_Text(byte[] payload, int payload_len)
 		{
 			int offset = 0;
@@ -175,23 +178,31 @@ namespace CSharpNETTestASKCSCDLL
 
 			byte[] rest_of_payload = new byte[payload_len - iana_lang_code_len - 1];
 			Array.Copy(payload, offset, rest_of_payload, 0, payload_len - iana_lang_code_len - 1);
-
-			Console.WriteLine("PAYLOAD = " + BitConverter.ToString(rest_of_payload));
+			
 			Console.WriteLine("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(rest_of_payload));
+			textBox1.AppendText("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(rest_of_payload) + System.Environment.NewLine);
 		}
 
+		/**
+		 * This method decode a payload of nfc known type URI
+		 */
 		private void Decode_URI(byte[] payload, int payload_len)
 		{
-			Console.WriteLine("PAYLOAD = " + BitConverter.ToString(payload));
 			string uri_prefix = URI_identifier_code(payload[0]);
 			byte[] rest_of_payload = new byte[payload_len - 1];
 			Array.Copy(payload, 1, rest_of_payload, 0, payload_len - 1);
-			Console.WriteLine("PAYLOAD = " + uri_prefix + System.Text.Encoding.ASCII.GetString(payload));
+			Console.WriteLine("PAYLOAD = " + uri_prefix + System.Text.Encoding.ASCII.GetString(rest_of_payload));
+			textBox1.AppendText("PAYLOAD = " + uri_prefix + System.Text.Encoding.ASCII.GetString(rest_of_payload) + System.Environment.NewLine);
 		}
 
+		/**
+		 * This method decode the NDEF file
+		 * recursive in the case of smart posters
+		 */
 		private int Decode_NDEF(byte[] ndef)
 		{
 			Console.WriteLine("DECODING : " + BitConverter.ToString(ndef));
+			textBox1.AppendText("DECODING : " + BitConverter.ToString(ndef) + System.Environment.NewLine);
 			int offset = 0;
 			int me;
 
@@ -241,24 +252,29 @@ namespace CSharpNETTestASKCSCDLL
 				byte[] type = new byte[type_len];
 				for (int i = 0; i < type_len; i++)
 				{
+					Console.WriteLine("type {0}: {1}", i, ndef[offset]);
 					type[i] = ndef[offset++];
 				}
 
 				if(type[0] == 0x54)
 				{
 					Console.WriteLine("Type is text");
+					textBox1.AppendText("Type is text" + System.Environment.NewLine);
 				}
 				else if(type[0] == 0x55)
 				{
 					Console.WriteLine("Type is URI");
+					textBox1.AppendText("Type is URI" + System.Environment.NewLine);
 				}
 				else if(type[0] == 0x53 && type[1] == 0x70)
 				{
 					Console.WriteLine("Type is smart poster");
+					textBox1.AppendText("Type is smart poster" + System.Environment.NewLine);
 				}
 				else
 				{
 					Console.WriteLine("Type is: " + System.Text.Encoding.ASCII.GetString(type) + " (not supported)");
+					textBox1.AppendText("Type is: " + System.Text.Encoding.ASCII.GetString(type) + " (not supported)" + System.Environment.NewLine);
 				}
 
 				// Parsing of the id, on id_len bytes
@@ -291,7 +307,10 @@ namespace CSharpNETTestASKCSCDLL
 				{
 					Console.WriteLine("PAYLOAD = " + BitConverter.ToString(payload));
 					Console.WriteLine("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload));
+					textBox1.AppendText("PAYLOAD = " + BitConverter.ToString(payload) + System.Environment.NewLine);
+					textBox1.AppendText("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload) + System.Environment.NewLine);
 				}
+				textBox1.AppendText(System.Environment.NewLine);
 			} while (me != 1);
 
 			return offset;
