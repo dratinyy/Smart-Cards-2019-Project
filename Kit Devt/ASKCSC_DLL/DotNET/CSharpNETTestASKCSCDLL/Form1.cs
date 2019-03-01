@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace CSharpNETTestASKCSCDLL
@@ -25,7 +26,7 @@ namespace CSharpNETTestASKCSCDLL
 		 * data1 and data2 used for data offset in read binary, data3 used as length
 		 * returns a Tuple with the response and its length
 		 */
-		private Tuple<byte[], int> Send_ISO_Command(int select_command, byte data1, byte data2, byte data3)
+		private Tuple<byte[], int> Send_ISO_Command(int select_command, byte data1, byte data2, byte data3, byte[] extra_data = null)
 		{
 			byte[] command;
 			string command_name;
@@ -41,12 +42,19 @@ namespace CSharpNETTestASKCSCDLL
 					command = new byte[] { 0x00, 0xA4, 0x00, 0x0C, 0x02, data1, data2 };
 					command_name = "SELECT  FILE";
 					break;
-				//Read binary
-				case 3:
-					command = new byte[] { 0x00, 0xB0, data1, data2, data3 };
-					command_name = "READ BINARY";
-					break;
-				default:
+                //Read binary
+                case 3:
+                    command = new byte[] { 0x00, 0xB0, data1, data2, data3 };
+                    command_name = "READ BINARY";
+                    break;
+                //Write binary
+                case 4:
+                    command = new byte[5 + extra_data.Length];
+                    new byte[] { 0x00, 0xD6, data1, data2, data3 }.CopyTo(command, 0);
+                    extra_data.CopyTo(command, 5);
+                    command_name = "WRITE BINARY";
+                    break;
+                default:
 					return null;
 			}
 
@@ -445,5 +453,137 @@ namespace CSharpNETTestASKCSCDLL
 			}
 			AskReaderLib.CSC.Close();
 		}
-	}
+
+        private static byte[] fromString(string data)
+        {
+            string converter = "0123456789ABCDEF";
+            Regex.Match(data, "[0-9A-F](-[0-9A-F]{2})*");
+
+            int offset = 0;
+            List<byte> result = new List<byte>();
+            char[] dataArr = data.ToCharArray();
+
+            while (offset < data.Length)
+            {
+                result.Add((byte) (converter.IndexOf(dataArr[offset]) * 16 + converter.IndexOf(dataArr[offset + 1])));
+                offset += 3;
+            }
+
+            Console.WriteLine(result.ToArray().ToString());
+            return result.ToArray();
+        }
+
+        private void write(object sender, EventArgs e)
+        {
+            AskReaderLib.CSC.sCARD_SearchExtTag SearchExtender;
+            int Status;
+            byte[] ATR;
+            ATR = new byte[200];
+            int lgATR;
+            lgATR = 200;
+            int Com = 0;
+            int SearchMask;
+
+            txtCom.Text = "";
+            txtCard.Text = "";
+
+            try
+            {
+                AskReaderLib.CSC.SearchCSC();
+                // user can also use line below to speed up coupler connection
+                //AskReaderLib.CSC.Open ("COM2");
+
+                // Define type of card to be detected: number of occurence for each loop
+                SearchExtender.CONT = 0;
+                SearchExtender.ISOB = 2;
+                SearchExtender.ISOA = 2;
+                SearchExtender.TICK = 1;
+                SearchExtender.INNO = 2;
+                SearchExtender.MIFARE = 0;
+                SearchExtender.MV4k = 0;
+                SearchExtender.MV5k = 0;
+                SearchExtender.MONO = 0;
+
+                if (AskReaderLib.CSC.EHP_PARAMS_EXT(1, 1, 0, 0, 0, 0, 0, 0, null, 0, 0) != AskReaderLib.CSC.RCSC_Ok)
+                {
+                    Console.WriteLine("Unable to set AutoSelect to 0");
+                    return;
+                }
+
+                // Define type of card to be detected
+                SearchMask = AskReaderLib.CSC.SEARCH_MASK_INNO | AskReaderLib.CSC.SEARCH_MASK_ISOB | AskReaderLib.CSC.SEARCH_MASK_ISOA | AskReaderLib.CSC.SEARCH_MASK_TICK;
+                Status = AskReaderLib.CSC.SearchCardExt(ref SearchExtender, SearchMask, 1, 20, ref Com, ref lgATR, ATR);
+
+                if (Status != AskReaderLib.CSC.RCSC_Ok)
+                    txtCom.Text = "Error :" + Status.ToString("X");
+                else
+                    txtCom.Text = Com.ToString("X");
+
+                if (Com == 2)
+                    txtCard.Text = "ISO14443A-4 no Calypso";
+                else if (Com == 3)
+                    txtCard.Text = "INNOVATRON";
+                else if (Com == 4)
+                    txtCard.Text = "ISOB14443B-4 Calypso";
+                else if (Com == 5)
+                    txtCard.Text = "Mifare";
+                else if (Com == 6)
+                    txtCard.Text = "CTS or CTM";
+                else if (Com == 8)
+                    txtCard.Text = "ISO14443A-3 ";
+                else if (Com == 9)
+                    txtCard.Text = "ISOB14443B-4 Calypso";
+                else if (Com == 12)
+                    txtCard.Text = "ISO14443A-4 Calypso";
+                else if (Com == 0x6F)
+                    txtCard.Text = "Card not found";
+                else
+                    txtCard.Text = "";
+
+                if (Com == 2 || Com == 4 || Com == 8 || Com == 9 || Com == 12)
+                {
+                    byte[] recordData = fromString(textBox1.Text);
+
+                    // Select Application
+                    Send_ISO_Command(1, 0x00, 0x00, 0x00);
+
+                    // Select CC File
+                    Send_ISO_Command(2, 0xE1, 0x03, 0x00);
+
+                    // Read CC File
+                    byte[] response = Send_ISO_Command(3, 0x00, 0x00, 0x0F).Item1;
+                    int MaxLe = (response[4] << 8) + response[5];
+                    int MaxLc = (response[6] << 8) + response[7];
+                    int file_id = (response[10] << 8) + response[11];
+                    int file_size = (response[12] << 8) + response[13];
+
+                    // Select NDEF File
+                    Send_ISO_Command(2, response[10], response[11], 0x00);
+                    byte data_offset_P1 = 0x00;
+                    byte data_offset_P2 = 0x00;
+                    byte length;
+
+                    // Write on NDEF File
+                    while (recordData.Length > (data_offset_P1 << 8) + data_offset_P2)
+                    {
+                        length = (byte)Math.Min(MaxLc, (recordData.Length - (data_offset_P1 << 8) - data_offset_P2));
+
+                        byte[] subArray = new byte[length];
+                        Array.Copy(recordData, ((data_offset_P1 << 8) + data_offset_P2), subArray, 0, length);
+                        Send_ISO_Command(4, data_offset_P1, data_offset_P2, length, subArray);
+
+                        // Updating the offset
+                        int tempint = (data_offset_P1 << 8) + data_offset_P2 + length;
+                        data_offset_P1 = (byte)(tempint >> 8);
+                        data_offset_P2 = (byte)(tempint);
+                    }
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Error on trying do deal with reader");
+            }
+            AskReaderLib.CSC.Close();
+        }
+    }
 }

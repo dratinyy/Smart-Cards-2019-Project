@@ -95,6 +95,10 @@ namespace SmartCardsEncoder
                 encodedRecords.AddRange(payload);
             }
 
+            int length = encodedRecords.ToArray().Length;
+            encodedRecords.Insert(0, (byte) (length % 256));
+            encodedRecords.Insert(0, (byte)(length / 256));
+
             return encodedRecords.ToArray();
         }
     }
