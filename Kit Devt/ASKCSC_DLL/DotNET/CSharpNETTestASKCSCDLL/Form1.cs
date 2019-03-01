@@ -165,6 +165,20 @@ namespace CSharpNETTestASKCSCDLL
 			return res;
 		}
 
+		/**
+		 * Write a line with the correct indentation in the GUI
+		 */
+		private void Write_Line_GUI(string line)
+		{
+			for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
+			textBox1.AppendText(line + System.Environment.NewLine);
+		}
+
+		private static int indentention = 0;
+
+		/**
+		 * This method decode a payload of nfc known type text 
+		 */
 		private void Decode_Text(byte[] payload, int payload_len)
 		{
 			int offset = 0;
@@ -173,37 +187,53 @@ namespace CSharpNETTestASKCSCDLL
 			int encoding = (status & 0b10000000) >> 7;
 			int iana_lang_code_len = status & 0b00111111;
 
-			if (encoding == 1) Console.WriteLine("utf-16"); else Console.WriteLine("utf-8");
+			if (encoding == 1)
+			{
+				Write_Line_GUI("Encodage : utf-16");
+				Console.WriteLine("utf-16");
+			}
+			else
+			{
+				Write_Line_GUI("Encodage : utf-8");
+				Console.WriteLine("utf-8");
+			}
 
 			byte[] iana_lang_code = new byte[iana_lang_code_len];
 			Array.Copy(payload, offset, iana_lang_code, 0, iana_lang_code_len);
-			Console.WriteLine("IANA Code: " + BitConverter.ToString(iana_lang_code));
+			Write_Line_GUI("IANA Code: " + System.Text.Encoding.ASCII.GetString(iana_lang_code));
 			Console.WriteLine("IANA Code: " + System.Text.Encoding.ASCII.GetString(iana_lang_code));
 			offset += iana_lang_code_len;
 
 			byte[] rest_of_payload = new byte[payload_len - iana_lang_code_len - 1];
 			Array.Copy(payload, offset, rest_of_payload, 0, payload_len - iana_lang_code_len - 1);
-
-			Console.WriteLine("PAYLOAD = " + BitConverter.ToString(rest_of_payload));
+			
 			Console.WriteLine("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(rest_of_payload));
+			Write_Line_GUI("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(rest_of_payload));
 		}
 
+		/**
+		 * This method decode a payload of nfc known type URI
+		 */
 		private void Decode_URI(byte[] payload, int payload_len)
 		{
-			Console.WriteLine("PAYLOAD = " + BitConverter.ToString(payload));
 			string uri_prefix = URI_identifier_code(payload[0]);
 			byte[] rest_of_payload = new byte[payload_len - 1];
 			Array.Copy(payload, 1, rest_of_payload, 0, payload_len - 1);
-			Console.WriteLine("PAYLOAD = " + uri_prefix + System.Text.Encoding.ASCII.GetString(payload));
+			Console.WriteLine("PAYLOAD = " + uri_prefix + System.Text.Encoding.ASCII.GetString(rest_of_payload));
+			Write_Line_GUI("PAYLOAD = " + uri_prefix + System.Text.Encoding.ASCII.GetString(rest_of_payload));
 		}
 
+		/**
+		 * This method decode the NDEF file
+		 * recursive in the case of smart posters
+		 */
 		private int Decode_NDEF(byte[] ndef)
 		{
 			Console.WriteLine("DECODING : " + BitConverter.ToString(ndef));
 			int offset = 0;
 			int me;
 
-			do
+			do //while(me != 1)
 			{
 				// Parsing of the header (1st byte)
 				byte header = ndef[offset++];
@@ -249,26 +279,39 @@ namespace CSharpNETTestASKCSCDLL
 				byte[] type = new byte[type_len];
 				for (int i = 0; i < type_len; i++)
 				{
+					Console.WriteLine("type {0}: {1}", i, ndef[offset]);
 					type[i] = ndef[offset++];
 				}
 
-				if(type[0] == 0x54)
+				if(type_len == 0)
 				{
-					Console.WriteLine("Type is text");
-				}
-				else if(type[0] == 0x55)
-				{
-					Console.WriteLine("Type is URI");
-				}
-				else if(type[0] == 0x53 && type[1] == 0x70)
-				{
-					Console.WriteLine("Type is smart poster");
+					Console.WriteLine("Type is <empty>");
+					Write_Line_GUI("Type is <empty>");
 				}
 				else
 				{
-					Console.WriteLine("Type is: " + System.Text.Encoding.ASCII.GetString(type) + " (not supported)");
+					if (type[0] == 0x54) // T = text
+					{
+						Console.WriteLine("Type is text");
+						Write_Line_GUI("Type is text");
+					}
+					else if (type[0] == 0x55) // U = URI
+					{
+						Console.WriteLine("Type is URI");
+						Write_Line_GUI("Type is URI");
+					}
+					else if (type[0] == 0x53 && type[1] == 0x70) // sp = smart poster
+					{
+						Console.WriteLine("Type is smart poster");
+						Write_Line_GUI("Type is smart poster");
+					}
+					else
+					{
+						Console.WriteLine("Type is: " + System.Text.Encoding.ASCII.GetString(type) + " (not supported)");
+						Write_Line_GUI("Type is: " + System.Text.Encoding.ASCII.GetString(type) + " (not supported)");
+					}
 				}
-
+				
 				// Parsing of the id, on id_len bytes
 				int id = 0;
 				for (int i = 0; i < id_len; i++)
@@ -283,23 +326,37 @@ namespace CSharpNETTestASKCSCDLL
 				offset += payload_len;
 
 				// Different processing of the payload depending on the type
-				if (type[0] == 0x54)
+				if(type_len == 0)
 				{
-					Decode_Text(payload, payload_len);
+					Write_Line_GUI("PAYLOAD = " + BitConverter.ToString(payload));
+					Write_Line_GUI("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload));
 				}
-				else if (type[0] == 0x55)
+				else
 				{
-					Decode_URI(payload, payload_len);
+					if (type[0] == 0x54) // 'T' => Text
+					{
+						Decode_Text(payload, payload_len);
+					}
+					else if (type[0] == 0x55) // 'U' => URI
+					{
+						Decode_URI(payload, payload_len);
+					}
+					else if (type[0] == 0x53 && type[1] == 0x70) // 'sp' => smart poster
+					{
+						indentention++;
+						Decode_NDEF(payload);
+						indentention--;
+					}
+					else //Unsupported type, we print it as ASCII
+					{
+						Console.WriteLine("PAYLOAD = " + BitConverter.ToString(payload));
+						Console.WriteLine("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload));
+						Write_Line_GUI("PAYLOAD = " + BitConverter.ToString(payload));
+						Write_Line_GUI("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload));
+					}
 				}
-				else if (type[0] == 0x53 && type[1] == 0x70)
-				{
-					Decode_NDEF(payload);
-				}
-				else //Unsupported type, we print it as ASCII
-				{
-					Console.WriteLine("PAYLOAD = " + BitConverter.ToString(payload));
-					Console.WriteLine("PAYLOAD = " + System.Text.Encoding.ASCII.GetString(payload));
-				}
+				
+				Write_Line_GUI("");
 			} while (me != 1);
 
 			return offset;
