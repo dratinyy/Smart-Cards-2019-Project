@@ -11,11 +11,13 @@ namespace SmartCardsEncoder
 
         public static byte[] Encode(Record[] records)
         {
-            // TODO 200 ?
             List<byte> encodedRecords = new List<byte>();
 
             foreach (Record r in records)
             {
+
+                // Set the record header
+
                 byte header = 0x00;
                 if (records[0] == r)
                     header += 128; // MB
@@ -23,6 +25,8 @@ namespace SmartCardsEncoder
                     header += 64; // ME
                 header += 16; // SR
                 header += 1; // TNF
+
+                // Set the record type_length and type
 
                 byte type_length = 0x00;
                 if (r.DataType == Record.TEXT_EN ||
@@ -42,6 +46,9 @@ namespace SmartCardsEncoder
                 List<byte> payload = new List<byte>();
                 if (r.DataType == Record.URL)
                 {
+                    // Encode an url using the Abbreviation Table
+                    // (not all abreviations from the table are available yet)
+
                     string url = System.Text.Encoding.ASCII.GetString(r.Data.ToArray());
                     if (url.StartsWith("http://www."))
                     {
@@ -63,8 +70,59 @@ namespace SmartCardsEncoder
                         payload.Add(0x04);
                         payload.AddRange(ASCIIEncoding.ASCII.GetBytes(url.Substring(8)));
                     }
+                    else if (url.StartsWith("tel:"))
+                    {
+                        payload.Add(0x05);
+                        payload.AddRange(ASCIIEncoding.ASCII.GetBytes(url.Substring(4)));
+                    }
+                    else if (url.StartsWith("mailto:"))
+                    {
+                        payload.Add(0x06);
+                        payload.AddRange(ASCIIEncoding.ASCII.GetBytes(url.Substring(7)));
+                    }
+                    else if (url.StartsWith("ftp://anonymous:anonymous@"))
+                    {
+                        payload.Add(0x07);
+                        payload.AddRange(ASCIIEncoding.ASCII.GetBytes(url.Substring(26)));
+                    }
+                    else if (url.StartsWith("ftp://ftp."))
+                    {
+                        payload.Add(0x08);
+                        payload.AddRange(ASCIIEncoding.ASCII.GetBytes(url.Substring(10)));
+                    }
+                    else if (url.StartsWith("ftps://"))
+                    {
+                        payload.Add(0x09);
+                        payload.AddRange(ASCIIEncoding.ASCII.GetBytes(url.Substring(7)));
+                    }
+                    else if (url.StartsWith("sftp://"))
+                    {
+                        payload.Add(0x0A);
+                        payload.AddRange(ASCIIEncoding.ASCII.GetBytes(url.Substring(7)));
+                    }
+                    else if (url.StartsWith("smb://"))
+                    {
+                        payload.Add(0x0B);
+                        payload.AddRange(ASCIIEncoding.ASCII.GetBytes(url.Substring(8)));
+                    }
+                    else if (url.StartsWith("nfs://"))
+                    {
+                        payload.Add(0x0C);
+                        payload.AddRange(ASCIIEncoding.ASCII.GetBytes(url.Substring(6)));
+                    }
+                    else if (url.StartsWith("ftp://"))
+                    {
+                        payload.Add(0x0D);
+                        payload.AddRange(ASCIIEncoding.ASCII.GetBytes(url.Substring(6)));
+                    }
+                    else
+                    {
+                        payload.Add(0x00);
+                        payload.AddRange(ASCIIEncoding.ASCII.GetBytes(url));
+                    }
                 }
                 else if (r.DataType == Record.TEXT_EN)
+                // Encode the text with the correct language code
                 {
                     payload.Add(0x02);
                     payload.Add(0x65);
@@ -94,6 +152,8 @@ namespace SmartCardsEncoder
                     encodedRecords.Add(type);
                 encodedRecords.AddRange(payload);
             }
+
+            // don't forget to specify the data length now !
 
             int length = encodedRecords.ToArray().Length;
             encodedRecords.Insert(0, (byte) (length % 256));
