@@ -170,8 +170,8 @@ namespace CSharpNETTestASKCSCDLL
 		 */
 		private void Write_Line_GUI(string line)
 		{
-			for (int i = 0; i < indentention; i++) textBox1.AppendText("\t");
-			textBox1.AppendText(line + System.Environment.NewLine);
+			for (int i = 0; i < indentention; i++) textBox2.AppendText("\t");
+            textBox2.AppendText(line + System.Environment.NewLine);
 		}
 
 		private static int indentention = 0;
